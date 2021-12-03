@@ -24,13 +24,37 @@ As a result, we attempt to apply an inference technique originally developed by 
 
 A/B Street is a city simulator developed by Dustin Carlino [cite] that supports map importing, people behavior patterns, traffic intersection and light dynamics, road structures, visualization, accessible metrics, and more. We chose A/B Street due to its ability to customize city features, its analysis metrics, and an API that links well with outside programs with or without the GUI.
 
-![Traffic Simulation run in A/B Street Gui](traffic_sim.gif)
+![Traffic Simulation run in A/B Street Gui](images/traffic_sim.gif)
 Traffic Simulation run in A/B Street
 
 
-![Editing roads in the A/B Street GUI](edit_roads.gif)
+
+![Editing roads in the A/B Street GUI](images/edit_roads.gif)
 Editing roads in the A/B Street GUI
 
-![Understanding simulation output](viz_delay_scatter.gif)
+
+![Understanding simulation output](images/viz_delay_scatter.gif)
 Understanding simulation output
+
+
+We plan to write an inference package that run and accept output from the A/B street simulations and understanding the underlying posterior of road structure on city and travel efficiency.
+
+
+## Expected Results
+
+As discussed above, there are some traits of road structure that are already understood: for example, increasing number of lanes doesn't necessarily decrease trip times. Using simulation inference, we hope to gain deeper insight on the design of intersections and intra-city roads on overall travel time and throughput, which may be counter-intuitive to what we may expect.
+
+
+
+## Future Goals
+
+As stated above, we use A/B Street and road design as a preliminary proof-of-concept on the application of simulation inference on city design. However, there are many more ways we can utilize this technique beyond just roads.
+
+A burgeoning field is that of understanding city design on the emissions produced by a city, and understanding how the block and road structure impacts the city's contribution to climate change. [cite]
+
+Relatedly is the concept of urban heat islands--when the city itself is warmer than the surrounding areas, resulting in greater air-pollution, heat-related illnesses. Understanding how building material and block structure impacts this could be of massive benefit [cite].
+
+Similarly, what kind of land-use patterns decrease storm-water runoff and susceptibility to climate-change related weather patterns [cite]. Additionally, how does the density and land-use patterns of a city impact it's emissions, and in turn, how do we minimize emissions while not adversely impacting livability and equity? [cite]
+
+Urban planning as a field is growing rapidly, and in turn, the applications of simulation and computational techniques are growing rapidly. Techniques previously used in physics, astronomy, and so on could easily be applied to urban planning feld to the benefit of society as a whole, which is what we hope to have shown here.
 
