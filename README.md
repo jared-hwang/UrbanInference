@@ -17,10 +17,25 @@ As a result, we attempt to apply an inference technique originally developed by 
 
 ## Method
 
-[inference]
+### Simulation-based inference
+Simulators are formally treated as probabilistic programs that take a vector of parameters
+$\theta$ as input, internally sample a series of latent states $z_i \sim
+p_i(z_i|\theta,z_{< i})$, and produce a data vector $x \sim p(x|\theta,z)$ as output. As
+such, simulators can be described by the joint distribution $p(x,z|\theta)$ over the
+output $x$ and latent variables $z$. This distribution captures the relative likelihoods
+of $(x,z)$ pairs under fixed parameter values, embracing the relationship between $\theta$
+and $z$ explicitly. Note that this can be written as the product 
+
+$$p(x,z|\theta) = p(x|z,\theta)p(z|\theta)$$
+
+![SBI diagram](images/sbi.png)
+Simulation-based inference diagram.
+
+![SNPE algorithm](images/snpe.png)
+Sequential neural posterior estimation diagram
 
 
-[ab street]
+### Simulator: A/B Street
 
 A/B Street is a city simulator developed by Dustin Carlino [cite] that supports map importing, people behavior patterns, traffic intersection and light dynamics, road structures, visualization, accessible metrics, and more. We chose A/B Street due to its ability to customize city features, its analysis metrics, and an API that links well with outside programs with or without the GUI.
 
