@@ -1,13 +1,75 @@
-# Applying simulation inference to city planning tools
-Samuel Griesemer\
-email\
-University of Southern California
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 
-Jared Hwang\
-jaredhwa@usc.edu\
-University of Southern California
+\title{Applying simulation inference to city planning tools}\label{Applying simulation inference to city planning}
+\author{Samuel Griesemer \\ email \\ University of Southern California \\
+   \and Jared Hwang \\ \href{mailto:jaredhwa@usc.edu}{jaredhwa@usc.edu} \\ University of Southern California}
+\date{}
 
-## Abstract
+\begin{document}
+\maketitle
+
+
+\hypertarget{Abstract}{%
+\subsection{Abstract}\label{Abstract}}
 
 The way cities are structured and designed can have a massive impact on 
 everything ranging from human health, to climate change, to societal equity. 
@@ -22,7 +84,9 @@ average trip time in the wider area. We find that.... We hope that these results
 show that simulation inference can be applied on the wider urban planning
 field as a whole.
 
-## Background
+
+\hypertarget{background}{%
+\subsection{Background}\label{background}}
 
 City and infrastructure design is only becoming more crucial as we as a
 society become more cognizant of out impact on climate change, public
@@ -42,63 +106,50 @@ usage, and so on, is extremely desirable to motivate better policy and design
 recommendations, but correspondingly can be difficult to pin down. 
 
 To approach this problem, we attempt to apply an inference technique
- developed by Papamakarios and Murray [[1]](#1) on A/B Street, a
-road/city planning simulation [[2]](#2), as a proof-of-concept
+ developed by Papamakarios and Murray \cite{Cranmer30055} on A/B Street, a
+road/city planning simulation \cite{Carlino}, as a proof-of-concept
 application of simulation inference on city planning simulations to
 broadly learn the impacts of traffic and road design on the efficiency
 and resource use of a city.
 
+\hypertarget{method}{%
+\subsection{Method}\label{method}}
 
-## Method
+{[}inference{]}
 
-### Simulation-based inference
-Simulators are formally treated as probabilistic programs that take a vector of parameters
-$\theta$ as input, internally sample a series of latent states $z_i \sim
-p_i(z_i|\theta,z_{< i})$, and produce a data vector $x \sim p(x|\theta,z)$ as output. As
-such, simulators can be described by the joint distribution $p(x,z|\theta)$ over the
-output $x$ and latent variables $z$. This distribution captures the relative likelihoods
-of $(x,z)$ pairs under fixed parameter values, embracing the relationship between $\theta$
-and $z$ explicitly. Note that this can be written as the product 
-
-$$p(x,z|\theta) = p(x|z,\theta)p(z|\theta)$$
-
-![SBI diagram](images/sbi.png)
-Simulation-based inference diagram.
-
-![SNPE algorithm](images/snpe.png)
-Sequential neural posterior estimation diagram
-
-
-### Simulator: A/B Street
+{[}ab street{]}
 
 A/B Street is a city and traffic simulator developed by Dustin Carlino, 
-built using the Open Street Map (OSM) format [[3]](#3). It is widely flexible and
+built using the Open Street Map (OSM) format \cite{4653466}. It is widely flexible and
 supports importing any map through OSM, changing lane type (driving, bus, bike) 
 and speed limits, traffic light timings, among others. It also has built in 
 visualization, data aggregation, and an API through which we can control the 
 simulation headlessly via Python code. We chose A/B Street due to these factors, 
 contributing to its ease of using it as a black box for the simulation inference. 
 
-![Traffic Simulation run in A/B Street Gui](images/traffic_sim.gif)
-Traffic Simulation run in A/B Street
+% \includegraphics{images/traffic_sim.gif} Traffic Simulation run in A/B
+Street
 
+% \includegraphics{images/edit_roads.gif} Editing roads in the A/B Street
+GUI
 
+% \includegraphics{images/viz_delay_scatter.gif} Understanding simulation
+output
 
-![Editing roads in the A/B Street GUI](images/edit_roads.gif)
-Editing roads in the A/B Street GUI
+We plan to write an inference package that runs and accepts output from
+the A/B street simulations and understand the underlying posterior of
+road structure on city and travel efficiency.
 
+\hypertarget{expected-results}{%
+\subsection{Expected Results}\label{expected-results}}
 
-![Understanding simulation output](images/viz_delay_scatter.gif)
-Understanding simulation output
+Using simulation inference, we hope to 
+gain deeper insight on the design of intersections and intra-city roads
+on overall travel time and throughput, which may be counter-intuitive to
+what we may expect.
 
-## Expected Results
-
-As discussed above, there are some traits of road structure that are already understood: for example, increasing number of lanes doesn't necessarily decrease trip times. Using simulation inference, we hope to gain deeper insight on the design of intersections and intra-city roads on overall travel time and throughput, which may be counter-intuitive to what we may expect.
-
-## Results
-
-
-## Future Goals
+\hypertarget{future-goals}{%
+\subsection{Future Goals}\label{future-goals}}
 
 As stated above, we use A/B Street and road design as a preliminary
 proof-of-concept on the application of simulation inference on city
@@ -109,7 +160,7 @@ A burgeoning field is that of understanding city design on the emissions
 produced by a city, and understanding how the block and road structure
 impacts the city's contribution to climate change. Gim performed a global 
 study of land-use on a various city's emissions, for example, congestion 
-leading to longer trip times leading to greater emissions [[4]](#4).
+leading to longer trip times leading to greater emissions \cite{doi:10.1080/15568318.2021.1901163}.
 By using a model and performing inference on it, we can potentially 
 understanding how to more granularly change current cities or motivate 
 future cities to reduce resource use and CO$_2$ emissions.
@@ -119,7 +170,7 @@ warmer than the surrounding areas, resulting in greater air-pollution,
 heat-related illnesses. Understanding how building material and block
 structure impacts this could be of massive benefit. Gober et al. explored this 
 for Phoenix, Arizona, by modeling three different scenarios based on gathered 
-data [[5]](#5). We could potentially use simulation 
+data \cite{doi:10.1080/01944360903433113}. We could potentially use simulation 
 inference on their model to more fundamentally understand the land-use and heat island 
 relationship.
 
@@ -127,7 +178,7 @@ Another area of interest is how policy changes can influence land-use in certain
 areas, thereby influencing everything about the city itself--from emissions to all 
 the other qualities discussed above. Landis investigated this using their California 
 Urban Futures Model, where they simulated the results of three different scenarios: 
-"business as usual", "Maximum Environmental Protection", and "Compact Cities" [[6]](#6).
+"business as usual", "Maximum Environmental Protection", and "Compact Cities" \cite{doi:10.1080/01944369508975656}.
  By applying inference on the model, perhaps we can obtain more optimal, fine grained 
  policy recommendations than just three scenarios would illuminate.
 
@@ -139,34 +190,16 @@ we hope to have shown that the application of computational techniques developed
 math, and so on could have countless uses in urban planning, and could serve to 
 benefit society as a whole. 
 
-## References
+\hypertarget{Author Contributions}{%
+\subsection{Author Contributions}\label{Author Contributions}}
+J.H. proposed the paths and topics that could benefit from applying computational
+methods upon. S.G. proposed applying the inference technique to city planning simulations
+and found the specific simulator A/B Street. Both members discussed the potential 
+areas of exploration using A/B Street. S.G. wrote the inference wrapper upon A/B Street
+and J.H. ran and enabled the software to run (via singularity container) on the USC 
+computing cluster. 
 
-<a id="1">[1]</a> 
-K. Cranmer, J. Brehmer, and G. Louppe, “The frontier of simulation-based
-inference,” Proceedings of the National Academy of Sciences, vol. 117, no. 48,
-pp. 30055–30062, 2020.
+\bibliography{references}
+\bibliographystyle{ieeetr}
 
-<a id="2">[2]</a> 
-D. Carlino, “A/B Street,” June 2018. Accessed on: Dec. 12, 2021. [Online] Available: https://abstreet.org
-
-<a id="3">[3]</a> 
-M. Haklay and P. Weber, “Openstreetmap: User-generated street maps,”
-IEEE Pervasive Computing, vol. 7, no. 4, pp. 12–18, 2008.
-
-<a id="4">[4]</a> 
-T.-H. T. Gim, “Analyzing the city-level effects of land use on travel time
-and co2 emissions: a global mediation study of travel time,” International
-Journal of Sustainable Transportation, vol. 0, no. 0, pp. 1–18, 2021.
-
-
-<a id="5">[5]</a> 
-P. Gober, A. Brazel, R. Quay, S. Myint, S. Grossman-Clarke, A. Miller, and
-S. Rossi, “Using watered landscapes to manipulate urban heat island effects:
-How much water will it take to cool phoenix?,” Journal of the American
-Planning Association, vol. 76, no. 1, pp. 109–121, 2009.
-
-
-<a id="6">[6]</a> 
-J. D. Landis, “Imagining land use futures: Applying the california urban
-futures model,” Journal of the American Planning Association, vol. 61, no. 4,
-pp. 438–457, 1995.
+\end{document}
