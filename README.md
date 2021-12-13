@@ -91,6 +91,19 @@ Editing roads in the A/B Street GUI
 ![Understanding simulation output](images/viz_delay_scatter.gif)
 Understanding simulation output
 
+## Software Requirements
+
+To run the code, download the A/B street repository (abstreet.org) and its 
+requirements and follow the instructions there to start a server headlessly with the desired map.
+Then, run the Python code provided in this repository.
+
+Alternatively, use the provided Singularity environment definition file to build a container 
+with the required packages, and simply run the headless Rust program in the A/B Street repository
+to start the server, then run the Python code here. This is particularly useful for 
+running the inference on a high-performance cluster for faster results, as we did using the University of Southern California Advanced Reserach Computing Cluster (CARC). NOTE: currently
+ the Singularity container does not quite work out of the box, due to some permissions 
+ errors that require extra work before and after building the container in order to have all the requisite software. This is a work in progress. 
+
 ## Expected Results
 
 As discussed above, there are some traits of road structure that are already understood: for example, increasing number of lanes doesn't necessarily decrease trip times. Using simulation inference, we hope to gain deeper insight on the design of intersections and intra-city roads on overall travel time and throughput, which may be counter-intuitive to what we may expect.
