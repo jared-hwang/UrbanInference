@@ -215,7 +215,7 @@ the training data; there are no empirical data in this setting for the model to 
 Here we see even shorter minimum stage delays, as well as shorter maximum extension times.
 This aligns with our original intuition that shorter stage delays likely lead to greater
 throughput, but it's clear the intervallic stage delays and extension times still play an
-important role (i.e. they don't dissolve despite being supported under the prior).
+important role (i.e. they don't dissolve despite their absence being supported under the prior).
 
 ## Future Goals
 As stated above, we use A/B Street and traffic light staging as a preliminary
