@@ -15,7 +15,7 @@ Understanding the relationship between a city's features to these qualities
 is paramount to designing cities according to our goals as a society. 
 Simulation-based inference is a method in which a simulator is described by 
 a joint distribution over some output of a simulation and some latent variables, 
-contitioned on some input. We thereby can attempt to directly learn the relationship between
+conditioned on some input. We thereby can attempt to directly learn the relationship between
 the output and the input parameters. We apply this technique to A/B Street, a traffic
 simulation tool, by investigating the impact of one intersection's traffic light
 timing on the average trip time in the wider area. We find that, when applied to 
@@ -118,7 +118,7 @@ As discussed above, there are some traits of road structure that are already und
 
 ## Future Goals
 
-As stated above, we use A/B Street and road design as a preliminary
+As stated above, we use A/B Street and traffic light staging as a preliminary
 proof-of-concept on the application of simulation inference on city
 design. However, there are many more ways we can utilize this technique
 beyond just roads.
@@ -129,12 +129,12 @@ impacts the city's contribution to climate change. Gim performed a global
 study of land-use on a various city's emissions, for example, congestion 
 leading to longer trip times leading to greater emissions [[5]](#5).
 By using a model and performing inference on it, we can potentially 
-understanding how to more granularly change current cities or motivate 
-future cities to reduce resource use and CO<sub>_2</sub> emissions.
+understand how to more granularly change current cities or motivate 
+future cities to reduce resource use and CO<sub>2</sub> emissions.
 
 Relatedly is the concept of urban heat islands--when the city itself is
-warmer than the surrounding areas, resulting in greater air-pollution,
-heat-related illnesses. Understanding how building material and block
+warmer than the surrounding areas, resulting in greater air-pollution and
+heat-related illnesses, among others. Understanding how building material and block
 structure impacts this could be of massive benefit. Gober et al. explored this 
 for Phoenix, Arizona, by modeling three different scenarios based on gathered 
 data [[6]](#6). We could potentially use simulation 
@@ -154,7 +154,7 @@ forward, however, there are many more that can and should be investigated. Urban
 as a field is growing rapidly, and in turn, applications of computational techniques in 
 the urban planning space are similarly growing. With the results we have presented here, 
 we hope to have shown that the application of computational techniques developed for physics, 
-math, and so on could have countless uses in urban planning, and could serve to 
+math, and so on could have countless uses in urban planning, and serve to 
 benefit society as a whole. 
 
 ## References
