@@ -13,17 +13,19 @@ import torch
 import torch.nn as nn 
 import torch.nn.functional as F
 
-import sbi.utils as utils
-from sbi.inference.base import infer
-from sbi.inference import SNPE, prepare_for_sbi, simulate_for_sbi
-
-from .ABStreet import ABStreet
+import time
 
 API = 'http://localhost:1234'
+ABSTREET_PATH = 'path/to/abstreet' # change this
+AB_CMD = 'cargo run --release --bin headless -- --port=1234'.split()
+abserver = {'proc': None}
 
-ab_cmd = 'cargo run --release --bin headless -- --port=1234'.split()
-abserver = subprocess.Popen(ab_cmd)
-absim = ABStreet(API)
+def restart_abserver():
+    print('Restarting AB server')
+    if abserver['proc'] is not None:
+        abserver['proc'].kill()
+    abserver['proc'] = subprocess.Popen(ab_cmd, cwd=ABSTREET_PATH, stdout=subprocess.DEVNULL)
+    time.sleep(3)
 
 def plotting(posterior_samples):
     # mode posterior params
@@ -43,8 +45,6 @@ def plotting(posterior_samples):
     a = sns.jointplot(
         x=posterior_samples[:,0].numpy().flatten(),
         y=posterior_samples[:,1].numpy().flatten(),
-        xlim=[0,length],
-        ylim=[0,width],
         marginal_ticks=False,
         kind="kde",
         marginal_kws=dict(fill=True))
@@ -52,8 +52,6 @@ def plotting(posterior_samples):
     a.ax_joint.text(mode[0]+2, mode[1]+0.5, 'mode')
     a.ax_joint.plot(mean[0], mean[1], 'yo')
     a.ax_joint.text(mean[0]+2, mean[1]+0.5, 'mean')
-    a.ax_joint.plot(rpos[0], rpos[1], 'rx')
-    a.ax_joint.text(rpos[0]+2, rpos[1]+0.5, 'target')
     plt.gcf().set_size_inches(10, 5.5)
     plt.savefig('density.png', format='png', dpi=300)
 
@@ -64,11 +62,6 @@ def sim_variable(params):
     variable traffic signal timing for each of four stages. Recovers fixed signal
     timing.
     '''
-    ab = ABStreet(API)
-    ab.set_traffic_signal_stages(373, {})
-    pass
-
-def sim_fixed(params):
     rp = params.reshape([4,3])
     absim.reset()
     res = absim.set_traffic_signal_stages(373, {
@@ -76,27 +69,52 @@ def sim_fixed(params):
     })
 
     if res < 0:
-        abserver.kill()
-        abserver = subprocess.Popen(ab_cmd)
+        restart_abserver()
         return 10e8
 
-    absim.run(12)
+    absim.run(24)
     return ab.data()['avg_trip_duration']
 
+def sim_fixed(params):
+    rp = params.reshape([4,1])
+    absim.reset()
+    res = absim.set_traffic_signal_stages(373, {
+        i : { 'Fixed': int((p*10000).tolist()[0]) } for i,p in enumerate(rp)
+    })
 
-if __name__ == '__main__':
-    # get baseline
-    absim.run(12)
-    pre_duration = absim.data()['avg_trip_duration']
+    if res < 0:
+        restart_abserver()
+        return torch.tensor([10e8])
+
+    absim.run(24)
+    return torch.tensor([absim.data()['avg_trip_duration']])
+
+def sim_simple(params):
+    absim.reset()
+    res = absim.set_traffic_signal_stages(373, {
+        i : { 'Fixed': int(params.tolist()[0]*10000) } for i in range(4)
+    })
+
+    if res < 0:
+        restart_abserver()
+        return torch.tensor([10e8])
+
+    absim.run(24)
+    return torch.tensor([absim.data()['avg_trip_duration']])
+
+
+def sim_simple_var(params):
+    absim.reset()
+    stages = {
+        i : { 'Variable': list(map(int, (params*10000).tolist())) } for i in range(4)
+    }
+    print('Submitting stages: {}'.format(stages))
     
-    # establish prior over timing variables
-    prior = utils.BoxUniform(low=torch.tensor([10]*4), high=torch.tensor([200]*4))
-    simulator, prior = prepare_for_sbi(sim_fixed, prior)
-    inference = SNPE(prior)
+    res = absim.set_traffic_signal_stages(373, stages)
+    
+    if res < 0:
+        restart_abserver()
+        return torch.tensor([10e5])
 
-    theta, x = simulate_for_sbi(simulator, proposal=prior, num_simulations=15000)
-    density_estimator = inference.append_simulations(theta, x).train()
-    posterior = inference.build_posterior(density_estimator)
-    posterior_samples = posterior.sample((50000,), x=real_data)
-
-    plotting(posterior_samples)
+    absim.run(24)
+    return torch.tensor([absim.data()['avg_trip_duration']])/10000

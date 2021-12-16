@@ -2,7 +2,6 @@ import json
 import requests
 import http
 
-
 class ABStreet():
     '''
     ABStreet simulation wrapper. Initialized on a per-map basis, can be reused for
@@ -138,18 +137,3 @@ class ABStreet():
     def save_edits(self, out):
         with open(out, 'w') as f:
             json.dump(self.get_map_edits(), f)
-
-
-if __name__ == '__main__':
-    sim = ABStreet('http://localhost:1234')
-    sim.reset()
-    sim.set_traffic_signal_stages(373, {
-        1: {
-            'Fixed':220000,
-        },
-        3: {
-            'Fixed':220000,
-        }
-    })
-    sim.run(12)
-    sim.data()

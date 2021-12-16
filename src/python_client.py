@@ -1,143 +1,42 @@
-#!/usr/bin/python3
-# This example will see how changing one traffic signal affects trip times.
-# Before running this script, start the API server:
-#
-# > cargo run --release --bin headless -- --port=1234
+import torch
+import numpy as np
 
-import json
-import requests
+import sbi.utils as utils
+from sbi.inference.base import infer
+from sbi.inference import SNPE, prepare_for_sbi, simulate_for_sbi
 
+from sbi_signal_timing import *
 
-api = 'http://localhost:1234'
-hours_to_sim = '12:00:00'
+# init wrapper
+absim = ABStreet(API)
 
-# 1. Load sim configuration
+# get baseline
+print('-- Running baseline --')
+absim.run(24)
+pre_duration = absim.data()['avg_trip_duration']/10000
 
+# establish prior over timing variables
+print('-- Verifying SBI setup --')
+prior = utils.BoxUniform(low=torch.tensor([12,0,0]), high=torch.tensor([80,20,80]))
 
-if True:
-    print('Current map edits:\n', requests.get(
-        api + '/map/get-edits').json())
-    print('Specific edit command:\n', 
+# set up SNPE
+simulator, prior = prepare_for_sbi(sim_simple, prior)
+inference = SNPE(prior)
 
+# run simulation trials
+theta, x = simulate_for_sbi(simulator, proposal=prior, num_simulations=250) # change this if needed
+density_estimator = inference.append_simulations(theta, x).train()
+posterior = inference.build_posterior(density_estimator)
 
-requests.get(
-    api + '/map/get-edit-road-command',
-    params={'id': 373}
-).json()
+# plotting (takes a while)
+diffs = [0,4,8]
+for diff in diffs:
+    posterior_samples = posterior.sample((30000,), x=torch.tensor([pre_duration-diff]))
+    plotting(posterior_samples)
 
-requests.get(
-    api + '/traffic-signals/get?id=42',
-    params={'id': 373}
-).json()
-
-
-
-def main():
-    # Make sure to start the simulation from the beginning
-    st = requests.get(api + '/sim/get-time').text
-    print('Did you just start the simulation? Time is currently', st)
-    print('Reset the simulation:', requests.get(api + '/sim/reset').text)
-    print()
-
-    # Run a few hours to get a baseline
-    print('Simulating before any edits')
-    trips1, delays1, thruput1 = run_experiment()
-    print('Baseline: {} finished trips, total of {} seconds'.format(
-        len(trips1), sum(trips1.values())))
-    print()
-
-    # Find the average position of all active pedestrians
-    agents = [x['pos'] for x in requests.get(
-        api + '/data/get-agent-positions').json()['agents'] if x['vehicle_type'] is None]
-    avg_lon = sum([x['longitude'] for x in agents]) / len(agents)
-    avg_lat = sum([x['latitude'] for x in agents]) / len(agents)
-    print('Average position of all active pedestrians: {}, {}'.format(avg_lon, avg_lat))
-    print()
-
-    # Modify one traffic signal, doubling the duration of its second stage
-    print('Modify a traffic signal')
-    ts = requests.get(api + '/traffic-signals/get', params={'id': 70}).json()
-    ts['stages'][1]['stage_type']['Fixed'] *= 2
-
-    # Reset the simulation before applying the edit, since reset also clears edits.
-    print('Reset the simulation:', requests.get(api + '/sim/reset').text)
-    print('Update a traffic signal:', requests.post(
-        api + '/traffic-signals/set', json=ts).text)
-    # Sanity check that the edits were applied
-    if True:
-        print('Current map edits:\n', requests.get(
-            api + '/map/get-edits').json())
-    print()
-
-    # Repeat the experiment
-    print('Simulating after the edits')
-    trips2, delays2, thruput2 = run_experiment()
-    print('Experiment: {} finished trips, total of {} seconds'.format(
-        len(trips2), sum(trips2.values())))
-    print()
-
-    # Compare -- did this help or not?
-    print('{} more trips finished after the edits (higher is better)'.format(
-        len(trips2) - len(trips1)))
-    print('Experiment was {} seconds faster, over all trips'.format(
-        sum(trips1.values()) - sum(trips2.values())))
-    print()
-
-    # Now we'll print some before/after stats per direction of travel through
-    # the intersection
-    col = '{:<40} {:>20} {:>20} {:>17} {:>17}'
-    print(col.format('Direction', 'avg delay before',
-                     'avg delay after', 'thruput before', 'thruput after'))
-    for k in delays1.keys():
-        print(col.format(k, delays1[k], delays2[k], thruput1[k], thruput2[k]))
-
-
-# Returns (trips, delay, throughput)
-def run_experiment():
-    print(requests.get(api + '/sim/goto-time',
-                       params={'t': hours_to_sim}).text)
-    raw_trips = requests.get(api + '/data/get-finished-trips').json()
-    raw_delays = requests.get(api + '/traffic-signals/get-delays',
-                              params={'id': 70, 't1': '00:00:00', 't2': hours_to_sim}).json()
+means = []
+for i in range(-10,10):
+    posterior_samples = posterior.sample((50000,), x=torch.tensor([pre_duration+i*10000]))
+    means.append(torch.mean(posterior_samples,axis=0).numpy())
     
-    # test get all traffic signals
-    #print(requests.get(api + '/traffic-signals/get-all-current-state').json())
-    raw_thruput = requests.get(
-        api + '/traffic-signals/get-cumulative-thruput', params={'id': 70}).json()
-
-    # Map trip ID to the duration (in seconds) of the trip. Filter out
-    # cancelled trips.
-    trips = {}
-    for trip in raw_trips:
-        if trip['duration'] is not None and trip.get('id'):
-            trips[trip['id']] = trip['duration']
-
-    # The direction is a dict, but Python can't handle dicts as keys. Stringify
-    # the keys, also filtering out crosswalks and empty directions.
-    delays = {}
-    for k, v in raw_delays['per_direction']:
-        k = stringify_direction(k)
-        if k and v:
-            delays[k] = '{:.1f}'.format(sum(v) / len(v))
-
-    thruput = {}
-    for k, v in raw_thruput['per_direction']:
-        k = stringify_direction(k)
-        if k:
-            thruput[k] = v
-
-    return (trips, delays, thruput)
-
-
-def stringify_direction(direxn):
-    if direxn['crosswalk']:
-        return None
-    return '{} -> {}'.format(stringify_road(direxn['from']), stringify_road(direxn['to']))
-
-
-def stringify_road(directed_road):
-    return 'Road #{} ({})'.format(directed_road['road'], directed_road['dir'])
-
-
-if __name__ == '__main__':
-    main()
+print('Difference of best run: {}'.format(pre_duration-x[np.argmin(x)]))
