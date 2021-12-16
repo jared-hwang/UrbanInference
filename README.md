@@ -69,7 +69,7 @@ and p(x | z, θ) to yield the final output vector given the inputs and latents. 
 likelihood function p(x | θ) implicitly defined by the simulator can then be seen as
 a marginalization of this form with respect to the latent variables:
 
-$$p(x|\theta) = \int p(x,z|\theta)dz$$
+p(x|θ) = ∫ p(x,z|θ)dz
 
 Note that this integral depends on all possible trajectories through the latent space.
 That is, for a given value of x, evaluating the likelihood at that value depends on all
@@ -136,7 +136,7 @@ residents. We focus explicitly on intersection #373 (as labeled by A/B street), 
 below:
 
 ![Intersection #373 and its stages, as shown in the A/B Street GUI](images/ts373.png)
-Intersection #373 and its stages, as shown in the A/B Street GUI
+_(Intersection #373 and its stages, as shown in the A/B Street GUI)_
 
 A/B Street admits a certain level of flexibility when it comes to modeling the behavior of
 traffic signal stages. We focus on _variable staging_, where each stage's dynamics are
@@ -162,13 +162,14 @@ approximate the posterior p(θ | x). Here x∈ℝ, the average travel time (in s
 trips taken in the region within a 24 hour period. Note that each simulation run has a
 deterministic set of trips to be taken by simulated individuals, allowing us to directly
 compare travel times under different traffic signal behaviors. Drawing samples from the
-posterior conditioned on travel times observed prior to any change (denoted x<sub>o<\sub>) yields the
+posterior conditioned on travel times observed prior to any change (denoted x<sub>o</sub>) yields the
 following plot:
 
 ![Posterior over the three traffic signal parameters, conditioned on baseline travel
 duration](images/trafsig1.png)
-Posterior over the three traffic signal parameters, conditioned on baseline travel
-duration; p(θ | x<sub>o<\sub>)
+ 
+_(Posterior over the three traffic signal parameters, conditioned on baseline travel
+duration; p(θ | x<sub>o</sub>))_
 
 The "dim 1", "dim 2", and "dim 3" labels in this plot (and similar plots below) correspond
 to parameter values θ<sub>1</sub>, θ<sub>2</sub>, and θ<sub>3</sub>, respectively. This
@@ -183,8 +184,9 @@ seconds below the baseline:
 
 ![Posterior over the three traffic signal parameters, conditioned on 4 seconds below baseline travel
 duration](images/trafsig2.png)
-Posterior over the three traffic signal parameters, conditioned on 4 seconds below baseline travel
-duration; p(θ | x<sub>o<\sub>-4s)
+
+_(Posterior over the three traffic signal parameters, conditioned on 4 seconds below baseline travel
+duration; p(θ | x<sub>o</sub>-4s))_
 
 Here we see a noticeable decrease in the mean of θ<sub>1</sub>, suggesting the shorter
 stages can yield improved traffic throughput. Conditioning on even small traffic durations
@@ -192,8 +194,9 @@ stages can yield improved traffic throughput. Conditioning on even small traffic
 
 ![Posterior over the three traffic signal parameters, conditioned on 8 seconds below baseline travel
 duration](images/trafsig3.png)
-Posterior over the three traffic signal parameters, conditioned on 8 seconds below baseline travel
-duration; p(θ | x<sub>o<\sub>-8s)
+ 
+_(Posterior over the three traffic signal parameters, conditioned on 8 seconds below baseline travel
+duration; p(θ | x<sub>o</sub>-8s))_
 
 Notice in this setting we also observe more probability mass centered around the mode of
 marginal distributions for parameters θ<sub>2</sub> and θ<sub>3</sub>. This suggests that
@@ -203,8 +206,9 @@ shorter than any observed average duration (minimum was ~8.5 seconds below basel
 
 ![Posterior over the three traffic signal parameters, conditioned on 10 seconds below baseline travel
 duration](images/trafsig4.png)
-Posterior over the three traffic signal parameters, conditioned on 10 seconds below baseline travel
-duration; p(θ | x<sub>o<\sub>-10s)
+ 
+_(Posterior over the three traffic signal parameters, conditioned on 10 seconds below baseline travel
+duration; p(θ | x<sub>o</sub>-10s))_
 
 This plot captures our model's generalized understanding of traffic dynamics just beyond
 the training data; there are no empirical data in this setting for the model to pull from.
